@@ -1,0 +1,16 @@
+.venv/
+.venv-test/
+__pycache__/
+*.pyc
+
+.idea/
+*.iml
+
+*.mp4
+*.png
+*.nrrd
+
+pynrrd/
+
+test_report.txt
+performance_history.csv
