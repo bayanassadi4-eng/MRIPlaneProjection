@@ -14,3 +14,5 @@ pynrrd/
 
 test_report.txt
 performance_history.csv
+.venv-clean/
+
