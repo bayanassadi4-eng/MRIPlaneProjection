@@ -60,13 +60,30 @@ def project_plane(volume, points):
 
     if not np.isfinite(height_length) or height_length < EPS:
         raise ValueError("Plane height must be positive")
+    # Validate an isosceles triangle
+    if len(points) == 3:
+        side1 = np.linalg.norm(bottom_left - top_left)
+        side2 = np.linalg.norm(bottom_right - top_left)
 
+        if abs(side1 - side2) >= 0.001:
+            raise ValueError(
+                "Invalid triangle: sides must be equal"
+            )
     if len(points) == 4:
         side1 = np.linalg.norm(bottom_left - top_left)
         side2 = np.linalg.norm(bottom_right - top_right)
+        top_width = np.linalg.norm(
+            top_right - top_left
+        )
 
-        if not np.isclose(side1, side2, atol=0.001):
-            print("Warning: trapezoid sides have different lengths")
+        if top_width > bottom_width:
+            raise ValueError(
+                "Invalid trapezoid: top edge is longer than bottom edge"
+            )
+        if abs(side1 - side2) >= 0.001:
+           raise ValueError(
+            "Invalid trapezoid: sides must be equal"
+        )
 
         normal = np.cross(bottom_vector, height_vector)
         normal_length = np.linalg.norm(normal)
@@ -80,8 +97,10 @@ def project_plane(volume, points):
             np.dot(top_right - top_left, normal)
         )
 
-        if out_of_plane > 0.001:
-            print("Warning: 4 input points are not coplanar")
+        if out_of_plane >= 0.001:
+         raise ValueError(
+        "Invalid trapezoid: points are not coplanar"
+    )
 
     top_left_x = np.dot(
         top_left - bottom_left,
@@ -206,8 +225,35 @@ def project_plane(volume, points):
 
 
 def to_video_frame(image, height, width, max_intensity):
-    """Convert a grayscale MRI slice into a video frame."""
+    """Convert an MRI image or an error into a video frame."""
 
+    # Invalid plane: create a black frame with a red X.
+    if image is None:
+        frame = np.zeros(
+            (height, width, 3),
+            dtype=np.uint8
+        )
+
+        rows = np.arange(height)
+
+        cols = np.rint(
+            rows * (width - 1) / max(height - 1, 1)
+        ).astype(int)
+
+        for offset in range(-2, 3):
+            left = np.clip(cols + offset, 0, width - 1)
+            right = np.clip(
+                width - 1 - cols + offset,
+                0,
+                width - 1
+            )
+
+            frame[rows, left, 0] = 255
+            frame[rows, right, 0] = 255
+
+        return frame
+
+    # Valid plane: convert the MRI image as before.
     gray = np.clip(
         image.astype(np.float32)
         * (255.0 / max_intensity),
@@ -232,7 +278,6 @@ def to_video_frame(image, height, width, max_intensity):
         3,
         axis=2
     )
-
 
 def main():
     if len(sys.argv) != 4:
@@ -314,10 +359,11 @@ def main():
                     skipped_planes += 1
 
                     print(
-                        f"Warning: Skipping invalid plane "
-                        f"{number}: {error}"
+                         f"Warning: Invalid plane "
+                         f"{number}: {error}"
                     )
 
+                    all_images.append(None)
                     continue
 
                 all_images.append(image)
@@ -335,20 +381,27 @@ def main():
     elapsed = time.perf_counter() - started
 
     if not all_images:
-        print("No valid planes found in the CSV")
-        print("Skipped planes:", skipped_planes)
+        print("The CSV contains no planes")
         return
 
-    max_h = max(
-        image.shape[0]
-        for image in all_images
-    )
+    valid_images = [
+        image for image in all_images
+        if image is not None
+    ]
 
-    max_w = max(
-        image.shape[1]
-        for image in all_images
-    )
+    if valid_images:
+        max_h = max(
+            image.shape[0]
+            for image in valid_images
+        )
 
+        max_w = max(
+            image.shape[1]
+            for image in valid_images
+        )
+    else:
+        max_h = 256
+        max_w = 256
     canvas_h = (max_h + 15) // 16 * 16
     canvas_w = (max_w + 15) // 16 * 16
 
