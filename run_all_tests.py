@@ -15,6 +15,7 @@ TEST_FILES = [
     "test_reference_values.py",
     "test_tilted_reference.py",
     "test_pixel_rounding.py",
+    "test_invalid_geometry.py",
 ]
 
 BENCHMARK_FILE = "benchmark.py"
