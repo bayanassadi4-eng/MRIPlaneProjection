@@ -85,7 +85,7 @@ The program includes basic input validation and error handling.
 - Excessively large projection images are rejected.
 - Coordinates outside the MRI volume produce black pixels where sampling is invalid.
 - The program reports the number of valid and skipped regions.
-- If no valid regions are found, the program reports this and does not create a new video.
+- If the CSV contains rows but all planes are invalid, the program generates error frames. An empty CSV does not produce a video.
 
 Invalid CSV rows do not prevent subsequent valid rows from being processed.
 
@@ -186,14 +186,39 @@ The benchmark measures projection processing only.
 It excludes MRI file loading and MP4 video encoding.
 
 Actual performance depends on the computer, input dimensions, region sizes, and workload.
+### Large Volume Performance Test (500x500x500)
 
+A synthetic 3D volume of size 500x500x500
+was used to evaluate projection performance.
+
+- Volume data type: uint8
+- Number of test planes: 4
+- Benchmark rounds: 5
+- Projections per round: 20
+- Average processing rate: 67.11 projections/second
+- Median processing rate: 66.89 projections/second
+- Minimum processing rate: 65.02 projections/second
+- Maximum processing rate: 68.69 projections/second
+
+The measured processing rate exceeded 30
+projections per second but did not reach
+the expected rate of approximately 100.
+
+The benchmark measures projection computation only.
+It excludes NRRD loading and video encoding.
+
+Profiling identified project_plane as the main
+computational bottleneck.
+
+The benchmark used synthetic volume data rather
+than a real MRI scan.
 ## Current Limitations
 
 - MRI projection uses nearest-neighbor sampling rather than interpolation between neighboring voxels.
 - Input coordinates are interpreted as MRI array indices.
 - The program assumes the expected point ordering and CSV structure.
-- Invalid rows are skipped rather than automatically repaired.
-- The video contains one frame for each valid input row.
+- Invalid rows produce marked error frames instead of being automatically repaired.
+- The video contains one frame for each CSV data row, including error frames for invalid planes.
 - Large numbers of projections may increase memory usage because generated images are stored before video encoding.
 - Testing on Windows does not guarantee identical behavior on every operating system.
 - Additional testing may be needed for unusual or geometrically inconsistent input regions.

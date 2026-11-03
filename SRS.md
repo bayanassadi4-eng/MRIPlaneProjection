@@ -190,3 +190,49 @@ Successful tests do not guarantee correct behavior for every possible geometric 
 - Performance depends on input size and computer resources.
 - Cross-platform execution has not been independently tested on every operating system.
 - Additional verification is needed for unusual geometric configurations and exact compliance with the assignment's coordinate conventions.
+-
+## 8. Final Validation and Performance Results
+
+### Automated Testing
+
+The project includes 25 automated checks across five test files:
+
+- 6 geometry tests
+- 2 reference pixel value tests
+- 2 tilted reference tests
+- 11 pixel rounding tests
+- 4 invalid geometry tests
+
+All 25 tests passed in the latest test run.
+
+### Invalid Plane Handling
+
+Invalid triangle and trapezoid definitions raise ValueError.
+
+During video generation, invalid CSV rows produce
+marked error frames instead of being removed.
+
+The original CSV row order is preserved.
+
+### Large Volume Benchmark
+
+A synthetic 500x500x500 uint8 volume was tested.
+
+- Average processing rate: 67.11 projections/second
+- Minimum: 65.02 projections/second
+- Maximum: 68.69 projections/second
+
+The benchmark measures projection computation,
+excluding MRI loading and video encoding.
+
+The processing rate exceeded 30 projections/second
+but did not reach the approximately 100
+projections/second performance expectation.
+
+### Validation Status
+
+The application passed the recorded automated tests
+and invalid-input video checks.
+
+Further testing may be needed for unusual input
+geometries and different computer environments.
