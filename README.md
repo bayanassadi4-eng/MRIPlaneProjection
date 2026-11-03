@@ -259,3 +259,72 @@ Demo details:
 - 30 FPS
 - MP4 video format
 - Triangle and trapezoid projections
+
+## Design Decisions and Justification
+
+### 1. Pixel Sampling
+
+The project uses nearest-neighbor sampling.
+
+Each calculated 3D position is rounded to the
+nearest voxel using NumPy's np.rint function.
+
+This method was selected because it is simple,
+efficient, and consistent with the assignment's
+guidance regarding voxel selection.
+
+Pixel rounding tests verify several boundary
+and fractional-coordinate cases.
+
+### 2. Invalid Plane Handling
+
+Invalid geometric definitions raise ValueError.
+
+During video generation, these exceptions are
+handled without stopping the remaining projections.
+
+Each invalid CSV row produces a black frame
+with a red X.
+
+This preserves the original CSV row order
+and makes invalid projections visible.
+
+### 3. Automated Testing
+
+The project uses automated tests for geometry,
+reference pixel values, tilted planes, rounding,
+and invalid geometric definitions.
+
+The test runner reports failing test files
+and includes individual test output.
+
+A mutation testing experiment demonstrated that
+the tests detect an intentional rounding bug
+and identify the failing case.
+
+### 4. Performance Monitoring
+
+Performance benchmarks measure the number of
+projections processed per second.
+
+The automated test runner compares performance
+against a recorded baseline and reports
+significant regressions.
+
+A separate benchmark evaluates projection
+performance using a synthetic 500x500x500 volume.
+
+The measured average was 67.11 projections/second.
+
+### 5. Limitations and Trade-offs
+
+Nearest-neighbor sampling does not interpolate
+between neighboring voxels.
+
+The current implementation stores projection
+images in memory before video encoding.
+
+Coordinates are interpreted as MRI array indices.
+
+The tests cover defined scenarios but cannot
+guarantee correctness for every possible input.
