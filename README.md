@@ -37,6 +37,22 @@ On Windows, `py` may be used instead of `python`.
 
 The program requires three command-line arguments:
 
+## MRI Dataset
+
+The MRI dataset used for this assignment is available
+through the link provided in the original assignment:
+
+[Download MRI Dataset](https://drive.google.com/file/d/1cqqOgSf8k4e14K5CBs-V_EvMmATX1K-J/view?usp=sharing)
+
+The project was tested using the file:
+`MRHead_1 (1).nrrd`
+
+Place the NRRD file in the project directory before
+running the application.
+
+If the downloaded filename is different, use its
+actual filename in the command-line arguments.
+
 1. **NRRD file:** A three-dimensional MRI volume.
 2. **CSV file:** A list of triangular or trapezoidal regions defined by 3D coordinates.
 3. **Output file:** The name or path of the generated MP4 video.
@@ -230,3 +246,16 @@ The project does not depend on fixed coordinates from `Ex0.csv` or `MRI_test.csv
 The CSV file is supplied as a command-line argument, allowing the program to process different input datasets that follow the expected format.
 
 The video playback setting remains fixed at 30 FPS.
+
+## Demo Video
+
+The final MRI projection demo is available
+in GitHub Releases:
+
+[Download MRI Final Demo](https://github.com/bayanassadi4-eng/MRIPlaneProjection/releases/download/v1.0.0/MRI_final_demo.mp4)
+
+Demo details:
+- 60 frames
+- 30 FPS
+- MP4 video format
+- Triangle and trapezoid projections
