@@ -62,7 +62,7 @@ The system shall detect supported types of invalid input, including:
 
 The system shall report understandable warnings for invalid CSV rows and continue processing subsequent valid rows when possible.
 
-If no valid projections are found, the system shall report the condition without generating a new video.
+If all CSV planes are invalid, the system shall generate a video containing an error frame for each row. An empty CSV does not produce a video.
 
 **FR10 – Processing Information**
 
@@ -78,7 +78,7 @@ The system shall display processing information, including:
 
 **FR11 – Preview Image**
 
-The system shall save a PNG preview showing the first valid projection.
+The system shall save a PNG preview of the first output frame, which may be an error frame.
 
 ### 3. Non-Functional Requirements
 
@@ -185,7 +185,7 @@ Successful tests do not guarantee correct behavior for every possible geometric 
 - Input coordinates are interpreted as MRI array indices.
 - The program relies on the expected coordinate ordering and CSV structure.
 - Invalid CSV rows are skipped rather than repaired.
-- Geometric inconsistencies such as unequal trapezoid side lengths may produce warnings without automatic correction.
+- Invalid triangle or trapezoid geometry raises ValueError. The demo handles these exceptions by generating marked error frames.
 - All valid projection images are stored in memory before video encoding.
 - Performance depends on input size and computer resources.
 - Cross-platform execution has not been independently tested on every operating system.

@@ -77,17 +77,94 @@ python main.py input.nrrd input.csv output.mp4
 
 The MRI and CSV file paths can be changed without modifying the source code.
 
+
 ## How It Works
 
-1. Load the 3D MRI volume from the NRRD file.
-2. Read the coordinate information from the CSV file.
-3. Identify whether each region is a triangle or trapezoid.
-4. Calculate sampling positions inside the region.
-5. Sample MRI voxel intensities using nearest-neighbor sampling.
-6. Set positions outside the MRI volume to zero.
-7. Convert valid projections into video frames.
-8. Export the frames as an MP4 video at 30 FPS.
-9. Save a preview image of the first valid projection.
+### Detailed Projection Algorithm
+
+The implementation uses NumPy to compute 2D
+projections from a 3D MRI volume.
+
+1. Load the NRRD file as a three-dimensional
+   NumPy array and read the input CSV file.
+
+2. For each CSV row, read three points for a
+   triangle or four points for a trapezoid.
+
+3. Validate the geometry:
+    - An isosceles triangle must have equal sides
+      within a tolerance of 0.001.
+    - A trapezoid must have equal side lengths.
+    - Its top edge cannot exceed its bottom edge.
+    - All four trapezoid points must be coplanar.
+    - Degenerate or non-finite coordinates are rejected.
+
+4. Define the horizontal sampling direction
+   using the normalized bottom-edge vector:
+
+   x_axis = (bottom_right - bottom_left) /
+   length(bottom_right - bottom_left)
+
+5. Calculate the midpoint of the top edge
+   and the midpoint of the bottom edge.
+
+6. Subtract the horizontal component from
+   the vector connecting these midpoints.
+   The resulting perpendicular component
+   determines the projection height.
+
+7. Determine the output image dimensions
+   using the projected horizontal coordinates
+   and the calculated height.
+
+8. Generate sampling rows between the top
+   and bottom edges using linear interpolation.
+
+9. For each output row, calculate the left
+   and right boundary positions.
+
+10. Calculate sampling positions between
+    these boundaries using NumPy arrays.
+
+11. Convert the calculated 3D coordinates
+    to voxel indices using nearest-neighbor
+    sampling with np.rint().
+
+12. Check whether each sampling position
+    belongs to the geometric region and
+    lies within the MRI volume boundaries.
+
+13. Copy valid MRI voxel intensities into
+    the output 2D image. Invalid or
+    out-of-bounds pixels remain zero.
+
+14. Return the projected image together
+    with the number of valid sampled pixels.
+
+### Video Generation
+
+1. Process the input planes in CSV order.
+
+2. Catch validation exceptions for invalid
+   planes and preserve their frame positions.
+
+3. Represent invalid planes with black
+   frames containing a red X.
+
+4. Normalize grayscale intensities and
+   center the images on a common canvas.
+
+5. Encode all frames into an MP4 video
+   at a playback rate of 30 FPS.
+
+6. Save a PNG preview of the first frame.
+
+The implementation uses vectorized NumPy
+operations to reduce Python-level loops
+and improve projection processing speed.
+
+Projection processing FPS and video
+playback FPS are measured separately.
 
 ## Error Handling
 
