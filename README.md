@@ -328,3 +328,31 @@ Coordinates are interpreted as MRI array indices.
 
 The tests cover defined scenarios but cannot
 guarantee correctness for every possible input.
+
+### Additional Performance Measurements
+
+The 500x500x500 benchmark was repeated twice
+without modifying the projection algorithm.
+
+First repeated benchmark:
+- Average: 117.07 projections/second
+- Minimum: 109.75 projections/second
+- Maximum: 128.90 projections/second
+
+Second repeated benchmark:
+- Average: 129.78 projections/second
+- Minimum: 121.49 projections/second
+- Maximum: 136.09 projections/second
+
+Both repeated measurements exceeded the
+approximately 100 projections/second expectation.
+
+The variation between runs may be related to
+system load, CPU scheduling, or other runtime
+conditions.
+
+These measurements cover projection computation
+only and exclude NRRD loading and MP4 encoding.
+
+No code optimization was applied between
+these benchmark runs.
