@@ -1,0 +1,43 @@
+
+name: MRI Automated Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Test geometry
+        run: python test_geometry.py
+
+      - name: Test reference pixel values
+        run: python test_reference_values.py
+
+      - name: Test tilted planes
+        run: python test_tilted_reference.py
+
+      - name: Test pixel rounding
+        run: python test_pixel_rounding.py
+
+      - name: Test invalid geometry
+        run: python test_invalid_geometry.py
+
+      - name: Synthetic 500 volume benchmark
+        run: python benchmark_500.py
